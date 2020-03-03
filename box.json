@@ -1,8 +1,8 @@
 {
     "name":"commandbox-stackChecker",
-    "version":"1.0.0",
+    "version":"1.1.0",
     "author":"Gavin Pickin",
-    "location":"gpickin/commandbox-stackChecker#v1.0.0",
+    "location":"gpickin/commandbox-stackChecker#v1.1.0",
     "homepage":"https://github.com/gpickin/commandbox-stackChecker",
     "documentation":"https://github.com/gpickin/commandbox-stackChecker",
     "repository":{

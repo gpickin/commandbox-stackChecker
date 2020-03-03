@@ -1,0 +1,28 @@
+{
+    "name":"commandbox-stackChecker",
+    "version":"1.0.0",
+    "author":"Gavin Pickin",
+    "location":"gpickin/commandbox-stackChecker#v1.0.0",
+    "homepage":"https://github.com/gpickin/commandbox-stackChecker",
+    "documentation":"https://github.com/gpickin/commandbox-stackChecker",
+    "repository":{
+        "type":"git",
+        "URL":"https://github.com/gpickin/commandbox-stackChecker"
+    },
+    "bugs":"https://github.com/gpickin/commandbox-stackChecker/issues",
+    "slug":"commandbox-stackChecker",
+    "shortDescription":"CommandBox Task Runner that allows you to check your local docker compose against your portainer stack file and your .env.example",
+    "description":"CommandBox Task Runner that allows you to check your local docker compose against your portainer stack file and your .env.example, including publishing your Docker Compose to your Stack",
+    "type":"modules",
+    "scripts":{
+        "postVersion":"package set location='gpickin/commandbox-stackChecker#v`package version`'",
+        "onRelease":"publish",
+        "postPublish":"!git push && git push --tags"
+    },
+    "dependencies":{
+        "cbyaml":"^1.0.3"
+    },
+    "installPaths":{
+        "cbyaml":"modules/cbyaml/"
+    }
+}

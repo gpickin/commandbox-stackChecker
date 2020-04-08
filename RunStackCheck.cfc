@@ -107,8 +107,8 @@ component {
         var composeFile = fileRead( expandPath( "build/env/#environment#/#variables.composeFile#" ) );
         var composeFileObject = parser.deserialize( composeFile );
         fileWrite( expandPath( ".env.stackFile" ), "" );
-        if( structKeyExists( composeFileObject.services[ environment ], "environment" ) && arrayLen( composeFileObject.services[ environment ].environment ) ){
-            for( var envVar in composeFileObject.services[ environment ].environment ){
+        if( structKeyExists( composeFileObject.services[ serviceName ], "environment" ) && arrayLen( composeFileObject.services[ serviceName ].environment ) ){
+            for( var envVar in composeFileObject.services[ serviceName ].environment ){
                 fileAppend( filepath=expandPath( ".env.stackFile" ), data=envVar& chr(13) );
             }
         } else {

@@ -6,6 +6,7 @@ component {
     property name="portainerPassword";
     property name="portainerURL";
     property name="composeFile";
+    property name="serviceName";
 
     /**
      * Run the CheckStack function to verify and validate the Stack file in Portainer vs the Compose file in the repo and the env variables in the .env.example file.
@@ -16,8 +17,9 @@ component {
      * @portainerPassword The password to log into Portainer with
      * @portainerURL The Portainer URL for this environment
      * @composeFile The name of the Compose/Stack file to use in the Local Environment - Defaulting to docker-compose.yml
+     * @serviceName The name of the Service in the Compose/Stack file to use in the Local Environment - Defaulting to the Environment Name
      */
-    function checkLocalStack( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml" ){
+    function checkLocalStack( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml", serviceName="" ){
         setVariables( argumentCollection=arguments );
 		var composeFile = validateDockerComposeFile();
         dotEnvCheck();
@@ -33,7 +35,7 @@ component {
      * @portainerURL The Portainer URL for this environment
      * @composeFile The name of the Compose/Stack file to use in the Local Environment - Defaulting to docker-compose.yml
      */
-    function checkRemoteStack( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml" ){
+    function checkRemoteStack( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml", serviceName="" ){
         setVariables( argumentCollection=arguments );
         diffFiles();
         validateStackFile();
@@ -49,7 +51,7 @@ component {
      * @portainerURL The Portainer URL for this environment
      * @composeFile The name of the Compose/Stack file to use in the Local Environment - Defaulting to docker-compose.yml
      */
-    function putStack( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml" ){
+    function putStack( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml", serviceName="" ){
         setVariables( argumentCollection=arguments );
         var composeFile = validateDockerComposeFile();
         dotEnvCheck();
@@ -73,13 +75,18 @@ component {
     /********************************************************************************************/
     /***************************    PRIVATE FUNCTIONS    ****************************************/
     /********************************************************************************************/
-    private function setVariables( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml" ){
+    private function setVariables( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml", serviceName="" ){
         variables.environment           = arguments.environment;
         variables.stackID               = arguments.stackID;
         variables.portainerUsername     = arguments.portainerUsername;
         variables.portainerPassword     = arguments.portainerPassword;
         variables.portainerURL          = arguments.portainerURL;
-        variables.composeFile          = arguments.composeFile;
+        variables.composeFile           = arguments.composeFile;
+        if( arguments.serviceName.len() ){
+            variables.serviceName       = arguments.serviceName;
+        } else {
+            variables.serviceName       = arguments.environment;
+        }
     }
 
     /**
@@ -113,7 +120,7 @@ component {
      * Diffs the stackFile from Portainer ( stored as stack.yml locally ) and the environments docker-compose.yml
      */
     private function diffFiles(){
-        getStackFileFromPortainer( environment );
+        getStackFileFromPortainer();
         print.line( "Diffing Files" ).toConsole();
         command( "!diff" )
             .params(

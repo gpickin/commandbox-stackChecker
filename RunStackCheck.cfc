@@ -5,6 +5,7 @@ component {
     property name="portainerUsername";
     property name="portainerPassword";
     property name="portainerURL";
+    property name="composeFile";
 
     /**
      * Run the CheckStack function to verify and validate the Stack file in Portainer vs the Compose file in the repo and the env variables in the .env.example file.
@@ -14,8 +15,9 @@ component {
      * @portainerUsername The username to log into Portainer with
      * @portainerPassword The password to log into Portainer with
      * @portainerURL The Portainer URL for this environment
+     * @composeFile The name of the Compose/Stack file to use in the Local Environment - Defaulting to docker-compose.yml
      */
-    function checkLocalStack( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL ){
+    function checkLocalStack( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml" ){
         setVariables( argumentCollection=arguments );
 		var composeFile = validateDockerComposeFile();
         dotEnvCheck();
@@ -29,8 +31,9 @@ component {
      * @portainerUsername The username to log into Portainer with
      * @portainerPassword The password to log into Portainer with
      * @portainerURL The Portainer URL for this environment
+     * @composeFile The name of the Compose/Stack file to use in the Local Environment - Defaulting to docker-compose.yml
      */
-    function checkRemoteStack( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL ){
+    function checkRemoteStack( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml" ){
         setVariables( argumentCollection=arguments );
         diffFiles();
         validateStackFile();
@@ -44,8 +47,9 @@ component {
      * @portainerUsername The username to log into Portainer with
      * @portainerPassword The password to log into Portainer with
      * @portainerURL The Portainer URL for this environment
+     * @composeFile The name of the Compose/Stack file to use in the Local Environment - Defaulting to docker-compose.yml
      */
-    function putStack( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL ){
+    function putStack( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml" ){
         setVariables( argumentCollection=arguments );
         var composeFile = validateDockerComposeFile();
         dotEnvCheck();
@@ -69,12 +73,13 @@ component {
     /********************************************************************************************/
     /***************************    PRIVATE FUNCTIONS    ****************************************/
     /********************************************************************************************/
-    private function setVariables( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL ){
+    private function setVariables( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml" ){
         variables.environment           = arguments.environment;
         variables.stackID               = arguments.stackID;
         variables.portainerUsername     = arguments.portainerUsername;
         variables.portainerPassword     = arguments.portainerPassword;
         variables.portainerURL          = arguments.portainerURL;
+        variables.composeFile          = arguments.composeFile;
     }
 
     /**
@@ -92,7 +97,7 @@ component {
      */
     private function createEnvStackFile(){
         var parser = setupYamlParser();
-        var composeFile = fileRead( expandPath( "build/env/#environment#/docker-compose.yml" ) );
+        var composeFile = fileRead( expandPath( "build/env/#environment#/#variables.composeFile#" ) );
         var composeFileObject = parser.deserialize( composeFile );
         fileWrite( expandPath( ".env.stackFile" ), "" );
         if( structKeyExists( composeFileObject.services[ environment ], "environment" ) && arrayLen( composeFileObject.services[ environment ].environment ) ){
@@ -114,7 +119,7 @@ component {
             .params(
                 "-c",
                 expandPath( "stack.yml" ),
-                expandPath( "build/env/#environment#/docker-compose.yml" )
+                expandPath( "build/env/#environment#/#variables.composeFile#" )
             )
             .run();
         print.green( "Diff Successful" ).toConsole();
@@ -126,13 +131,13 @@ component {
     private function dotEnvCheck(){
         print.line().line().bold( "Running DotEnv Check" ).line().toConsole();
         createEnvStackFile();
-        print.line( "Checking all .env.example variables exist in the local docker-compose.yml file" ).toConsole();
+        print.line( "Checking all .env.example variables exist in the local #variables.composeFile# file" ).toConsole();
         command( "dotenv check" )
             .params(
                 "envFileName" = ".env.stackFile"
             )
             .run();
-        print.line( "Checking all local docker-compose.yml env variables exist in the .env.example file" ).toConsole();
+        print.line( "Checking all local #variables.composeFile# env variables exist in the .env.example file" ).toConsole();
         command( "dotenv check" )
             .params(
                 "envFileName" = ".env.stackFile",
@@ -149,7 +154,7 @@ component {
     private function validateDockerComposeFile(){
         print.line().line( "Checking for valid Yaml File" ).toConsole();
         var parser = setupYamlParser();
-        var composeFile = fileRead( expandPath( "build/env/#environment#/docker-compose.yml" ) );
+        var composeFile = fileRead( expandPath( "build/env/#environment#/#variables.composeFile#" ) );
         var composeFileObject = parser.deserialize( composeFile );
         print.green( "Docker Compose is a valid Yaml File" ).line().toConsole();
         return composeFile;

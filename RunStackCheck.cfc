@@ -54,7 +54,7 @@ component {
     function putStack( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml", serviceName="" ){
         setVariables( argumentCollection=arguments );
         var composeFile = validateDockerComposeFile();
-        dotEnvCheck();
+        //dotEnvCheck();
         var newStackBody = {
             "StackFileContent": composeFile,
             "Prune": false

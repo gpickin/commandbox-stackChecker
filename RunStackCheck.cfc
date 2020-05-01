@@ -76,12 +76,24 @@ component {
     /***************************    PRIVATE FUNCTIONS    ****************************************/
     /********************************************************************************************/
     private function setVariables( environment="staging", required stackID, required portainerUsername, required portainerPassword, required portainerURL, composeFile="docker-compose.yml", serviceName="" ){
-        variables.environment           = arguments.environment;
-        variables.stackID               = arguments.stackID;
+        if( arguments.environment.len() ){
+            variables.environment           = arguments.environment;
+        } else {
+            variables.environment           = "staging"
+        }
+        if( arguments.stackID.len() ){
+            variables.stackID               = arguments.stackID;
+        } else {
+            variables.stackID           = "UNKNOWN-STACK-ID";
+        }
         variables.portainerUsername     = arguments.portainerUsername;
         variables.portainerPassword     = arguments.portainerPassword;
         variables.portainerURL          = arguments.portainerURL;
-        variables.composeFile           = arguments.composeFile;
+        if( arguments.composeFile.len() ){
+            variables.composeFile           = arguments.composeFile;
+        } else {
+            variables.composeFile       = "docker-compose.yml";
+        }
         if( arguments.serviceName.len() ){
             variables.serviceName       = arguments.serviceName;
         } else {

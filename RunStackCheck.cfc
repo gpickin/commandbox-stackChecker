@@ -65,8 +65,7 @@ component {
             cfhttpparam( type="body", name="body", value="#serializeJSON( newStackBody )#" );
         }
         if( result.status_text != "OK" ){
-            print.red( "Error updating Stack File" ).line().toConsole();
-            print.line( result );
+			error( "Error updating Stack File", serializeJSON( result ) );
         } else {
             print.green( "Stack file updated - service is udpating" ).line().toConsole();
         }

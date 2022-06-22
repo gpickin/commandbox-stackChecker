@@ -115,12 +115,12 @@ component {
      */
     private function createEnvStackFile(){
         var parser = setupYamlParser();
-        var composeFile = fileRead( expandPath( "build/env/#environment#/#variables.composeFile#" ) );
+        var composeFile = fileRead( resolvePath( "build/env/#environment#/#variables.composeFile#", getCWD() ) );
         var composeFileObject = parser.deserialize( composeFile );
-        fileWrite( expandPath( ".env.stackFile" ), "" );
+        fileWrite( resolvePath( ".env.stackFile", getCWD() ), "" );
         if( structKeyExists( composeFileObject.services[ serviceName ], "environment" ) && arrayLen( composeFileObject.services[ serviceName ].environment ) ){
             for( var envVar in composeFileObject.services[ serviceName ].environment ){
-                fileAppend( filepath=expandPath( ".env.stackFile" ), data=envVar& chr(13) );
+                fileAppend( filepath=resolvePath( ".env.stackFile", getCWD() ), data=envVar& chr(13) );
             }
         } else {
             print.magenta( "No Environment Variables in Compose File to compare" ).line().toConsole();
@@ -136,8 +136,8 @@ component {
         command( "!diff" )
             .params(
                 "-c",
-                expandPath( "stack.yml" ),
-                expandPath( "build/env/#environment#/#variables.composeFile#" )
+                resolvePath( "stack.yml", getCWD() ),
+                resolvePath( "build/env/#environment#/#variables.composeFile#", getCWD() )
             )
             .run();
         print.green( "Diff Successful" ).toConsole();
@@ -172,7 +172,7 @@ component {
     private function validateDockerComposeFile(){
         print.line().line( "Checking for valid Yaml File" ).toConsole();
         var parser = setupYamlParser();
-        var composeFile = fileRead( expandPath( "build/env/#environment#/#variables.composeFile#" ) );
+        var composeFile = fileRead( resolvePath( "build/env/#environment#/#variables.composeFile#", getCWD() ) );
         var composeFileObject = parser.deserialize( composeFile );
         print.green( "Docker Compose is a valid Yaml File" ).line().toConsole();
         return composeFile;
@@ -186,7 +186,7 @@ component {
     private function validateStackFile(){
         print.line().line( "Checking for valid Yaml File" ).toConsole();
         var parser = setupYamlParser();
-        var composeFile = fileRead( expandPath( "stack.yml" ) );
+        var composeFile = fileRead( resolvePath( "stack.yml", getCWD() ) );
         var composeFileObject = parser.deserialize( composeFile );
         print.green( "Stakc file is a valid Yaml File" ).line().toConsole();
         return composeFile;
@@ -206,7 +206,7 @@ component {
         print.line( serializeJSON( cfhttp ) ).toConsole();
         var stackFile = replaceNoCase( deserializeJSON( cfhttp.fileContent ).StackFileContent, "\n", chr(13), "all" );
         stackFile = replaceNoCase( stackFile, '\"', '"', "all" );
-        fileWrite( expandPath( "stack.yml" ), stackFile );
+        fileWrite( resolvePath( "stack.yml", getCWD() ), stackFile );
         print.line( "Stack.yml file created" ).toConsole();
         return stackFile;
     }

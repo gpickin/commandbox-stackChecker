@@ -1,0 +1,67 @@
+version: "3.4"
+# stackname - my-sample-stack
+secrets:
+  DB_DEVELOPMENT_USER:
+    external: true
+  DB_DEVELOPMENT_PASSWORD:
+    external: true
+  S3_ACCESS_KEY:
+    external: true
+  S3_SECRET_KEY:
+    external: true
+  JWT_SECRET:
+    external: true
+  SENDGRID_API_KEY:
+    external: true
+  API_CLIENT_TOKEN:
+    external: true
+  AWS_KEY:
+    external: true
+  # AWS_SECRET_KEY:
+  #   external: true
+
+services:
+  staging:
+    # Image to use
+    image: ortussolutions/commandbox
+
+    # Ports
+    ports:
+      - 54321:8080
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/_healthcheck"]
+      interval: 10s
+      timeout: 20s
+      retries: 3
+      start_period: 180s
+
+    environment:
+      - APP_ENV=staging
+      - ENVIRONMENT=staging
+      - TZ=America/Los_Angeles
+      - CFCONFIG_WHITESPACEMANAGEMENT=simple
+      - DB_USER=<<SECRET:DB_DEVELOPMENT_USER>>
+      - DB_PASSWORD=<<SECRET:DB_DEVELOPMENT_PASSWORD>>
+
+      - S3_ACCESS_KEY=<<SECRET:S3_ACCESS_KEY>>
+      - S3_SECRET_KEY=<<SECRET:S3_SECRET_KEY>>
+      - S3_DEFAULT_BUCKET=ap-storage-stg
+
+      - JWT_SECRET=<<SECRET:JWT_SECRET>>
+      - SENDGRID_API_KEY=<<SECRET:SENDGRID_API_KEY>>
+
+      - CLIENT_TOKEN=<<SECRET:API_CLIENT_TOKEN>>
+      - AWS_KEY=<<SECRET:AWS_KEY>>
+      - AWS_SECRET_KEY=<<SECRET:AWS_SECRET_KEY>>
+
+    secrets:
+      - DB_DEVELOPMENT_USER
+      - DB_DEVELOPMENT_PASSWORD
+      - S3_ACCESS_KEY
+      - S3_SECRET_KEY
+      - JWT_SECRET
+      - SENDGRID_API_KEY
+      - API_CLIENT_TOKEN
+      # - AWS_KEY
+      - AWS_SECRET_KEY

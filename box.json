@@ -1,32 +1,32 @@
 {
-  "name": "commandbox-stackChecker",
-  "version": "1.5.0",
-  "author": "Gavin Pickin",
-  "location": "gpickin/commandbox-stackChecker#v1.5.0",
-  "homepage": "https://github.com/gpickin/commandbox-stackChecker",
-  "documentation": "https://github.com/gpickin/commandbox-stackChecker",
-  "repository": {
-    "type": "git",
-    "URL": "https://github.com/gpickin/commandbox-stackChecker"
-  },
-  "bugs": "https://github.com/gpickin/commandbox-stackChecker/issues",
-  "slug": "commandbox-stackChecker",
-  "shortDescription": "CommandBox Task Runner that allows you to check your local docker compose against your portainer stack file and your .env.example and validates your secrets setup",
-  "description": "CommandBox Task Runner that allows you to check your local docker compose against your portainer stack file and your .env.example, including publishing your Docker Compose to your Stack and can validate your secrets setup",
-  "type": "modules",
-  "scripts": {
-    "postVersion": "package set location='gpickin/commandbox-stackChecker#v`package version`'",
-    "onRelease": "publish",
-    "postPublish": "!git push && git push --tags",
-    "checkLocalStack_test1": "task run taskfile=RunStackCheck target=checkLocalStack :composeFile=./test1/docker-compose.yml :envExampleFile=./test1/.env.example",
-    "checkLocalSecrets_test1": "task run taskfile=RunStackCheck target=checkLocalSecrets :composeFile=./test1/docker-compose.yml :envExampleFile=./test1/.env.example",
-    "checkRemote_test1": "task run taskfile=RunStackCheck target=checkRemoteStack :portainerUsername=${portainerUsername} :portainerPassword=${portainerPassword} :portainerURL=${portainerURL} :composeFile=./test1/docker-compose.yml :envExampleFile=./test1/.env.example",
-    "checkRemoteSecrets_test1": "task run taskfile=RunStackCheck target=checkRemoteSecrets :portainerUsername=${portainerUsername} :portainerPassword=${portainerPassword} :portainerURL=${portainerURL} :composeFile=./test1/docker-compose.yml :envExampleFile=./test1/.env.example"
-  },
-  "dependencies": {
-    "cbyaml": "^1.0.3"
-  },
-  "installPaths": {
-    "cbyaml": "modules/cbyaml/"
-  }
+    "name":"commandbox-stackChecker",
+    "version":"2.0.0",
+    "author":"Gavin Pickin",
+    "location":"gpickin/commandbox-stackChecker#v2.0.0",
+    "homepage":"https://github.com/gpickin/commandbox-stackChecker",
+    "documentation":"https://github.com/gpickin/commandbox-stackChecker",
+    "repository":{
+        "type":"git",
+        "URL":"https://github.com/gpickin/commandbox-stackChecker"
+    },
+    "bugs":"https://github.com/gpickin/commandbox-stackChecker/issues",
+    "slug":"commandbox-stackChecker",
+    "shortDescription":"CommandBox Task Runner that allows you to check your local docker compose against your portainer stack file and your .env.example and validates your secrets setup",
+    "description":"CommandBox Task Runner that allows you to check your local docker compose against your portainer stack file and your .env.example, including publishing your Docker Compose to your Stack and can validate your secrets setup",
+    "type":"modules",
+    "scripts":{
+        "postVersion":"package set location='gpickin/commandbox-stackChecker#v`package version`'",
+        "onRelease":"publish",
+        "postPublish":"!git push && git push --tags",
+        "checkLocalStack_test1":"task run taskfile=RunStackCheck target=checkLocalStack :composeFile=./test1/docker-compose.yml :envExampleFile=./test1/.env.example",
+        "checkLocalSecrets_test1":"task run taskfile=RunStackCheck target=checkLocalSecrets :composeFile=./test1/docker-compose.yml :envExampleFile=./test1/.env.example",
+        "checkRemote_test1":"task run taskfile=RunStackCheck target=checkRemoteStack :portainerUsername=${portainerUsername} :portainerPassword=${portainerPassword} :portainerURL=${portainerURL} :composeFile=./test1/docker-compose.yml :envExampleFile=./test1/.env.example",
+        "checkRemoteSecrets_test1":"task run taskfile=RunStackCheck target=checkRemoteSecrets :portainerUsername=${portainerUsername} :portainerPassword=${portainerPassword} :portainerURL=${portainerURL} :composeFile=./test1/docker-compose.yml :envExampleFile=./test1/.env.example"
+    },
+    "dependencies":{
+        "cbyaml":"^1.0.3"
+    },
+    "installPaths":{
+        "cbyaml":"modules/cbyaml/"
+    }
 }

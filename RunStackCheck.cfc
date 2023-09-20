@@ -6,6 +6,7 @@ component {
     property name="portainerPassword";
     property name="portainerURL";
     property name="composeFile";
+    property name="composePath";
     property name="serviceName";
     property name="envExampleFile";
     property name="jwt" default="";
@@ -190,7 +191,8 @@ component {
         portainerURL="", 
         composeFile="docker-compose.yml", 
         serviceName="", 
-        envExampleFile=".env.example" 
+        envExampleFile=".env.example" ,
+        composePath=""
     ){
         if( arguments.environment.len() ){
             variables.environment           = arguments.environment;
@@ -209,6 +211,11 @@ component {
             variables.composeFile           = arguments.composeFile;
         } else {
             variables.composeFile       = "docker-compose.yml";
+        }
+        if( arguments.composePath.len() ){
+            variables.composePath           = arguments.composePath;
+        } else {
+            variables.composePath       = "";
         }
         if( arguments.serviceName.len() ){
             variables.serviceName       = arguments.serviceName;
@@ -238,7 +245,9 @@ component {
     private function createEnvStackFile(){
         var composeFileObject = getComposeFileObject();
         fileWrite( resolvePath( ".env.stackFile", getCWD() ), "" );
-        if( structKeyExists( composeFileObject.services[ serviceName ], "environment" ) && arrayLen( composeFileObject.services[ serviceName ].environment ) ){
+        if( structKeyExists( composeFileObject.services, serviceName )
+            && structKeyExists( composeFileObject.services[ serviceName ], "environment" ) 
+            && arrayLen( composeFileObject.services[ serviceName ].environment ) ){
             for( var envVar in composeFileObject.services[ serviceName ].environment ){
                 fileAppend( filepath=resolvePath( ".env.stackFile", getCWD() ), data=envVar& chr(13) );
             }
@@ -250,8 +259,8 @@ component {
     function getComposeFileObject(){
         print.line().green( "Checking Secrets in Compose File are setup in Portainer" ).line().line().toConsole();
         var parser = setupYamlParser();
-        if( fileExists( resolvePath( variables.composeFile, getCWD() ) ) ){
-            var composeFile = fileRead( resolvePath( variables.composeFile, getCWD() ) );
+        if( len( variables.composePath ) && fileExists( resolvePath( variables.composePath & variables.composeFile, getCWD() ) ) ){
+            var composeFile = fileRead( resolvePath( variables.composePath & variables.composeFile, getCWD() ) );
         } else {
             var composeFile = fileRead( resolvePath( "build/env/#variables.environment#/#variables.composeFile#", getCWD() ) );
         }
@@ -322,8 +331,8 @@ component {
     private function diffFiles(){
         
         print.line( "Diffing Files" ).toConsole();
-        if( fileExists( resolvePath( variables.composeFile, getCWD() ) ) ){
-            var composePath = resolvePath( variables.composeFile, getCWD() );
+        if( len( variables.composePath ) && fileExists( resolvePath( variables.composePath & variables.composeFile, getCWD() ) ) ){
+            var composePath = resolvePath( variables.composePath & variables.composeFile, getCWD() );
         } else {
             var composePath = resolvePath( "build/env/#variables.environment#/#variables.composeFile#", getCWD() );
         }

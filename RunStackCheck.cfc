@@ -30,7 +30,7 @@ component {
     }
 
     /**
-     * CheckLocalSecrets function to verify the Compose file in the repo has all of the secrets setup correctly for the service, and top level in the Docker Compose file, , including secrets expected by CommandBox's `<<SECRET:MY_SECRET_NAME>>` format.
+     * CheckLocalSecrets function to verify the Compose file in the repo has all of the secrets setup correctly for the service, and top level in the Docker Compose file, including secrets expected by CommandBox's `<<SECRET:MY_SECRET_NAME>>` format.
      *
      * @environment Environment the build process is running, staging or production
      * @composeFile The name of the Compose/Stack file to use in the Local Environment - Defaulting to docker-compose.yml
@@ -245,7 +245,8 @@ component {
     private function createEnvStackFile(){
         var composeFileObject = getComposeFileObject();
         fileWrite( resolvePath( ".env.stackFile", getCWD() ), "" );
-        if( structKeyExists( composeFileObject.services, serviceName )
+        if( structKeyExists( composeFileObject, "services" )
+            && structKeyExists( composeFileObject.services, serviceName )
             && structKeyExists( composeFileObject.services[ serviceName ], "environment" ) 
             && arrayLen( composeFileObject.services[ serviceName ].environment ) ){
             for( var envVar in composeFileObject.services[ serviceName ].environment ){
@@ -257,7 +258,6 @@ component {
     }
 
     function getComposeFileObject(){
-        print.line().green( "Checking Secrets in Compose File are setup in Portainer" ).line().line().toConsole();
         var parser = setupYamlParser();
         if( len( variables.composePath ) && fileExists( resolvePath( variables.composePath & variables.composeFile, getCWD() ) ) ){
             var composeFile = fileRead( resolvePath( variables.composePath & variables.composeFile, getCWD() ) );

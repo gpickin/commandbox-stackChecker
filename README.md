@@ -200,7 +200,7 @@ checkRemoteStackFile_stg:
   only:
     - development
   script:
-    - cd build && box install commandbox-stackChecker
+    - cd build && box install commandbox-stackChecker@2
     - cd ../
     - box task run taskfile=build/modules/commandbox-stackChecker/RunStackCheck target=checkRemoteStack :environment=staging :stackID=$STG_STACKID :portainerUsername=$PORTAINER_USERNAME :portainerPassword=$PORTAINER_PASSWORD :portainerURL=$STG_PORTAINER_URL
 

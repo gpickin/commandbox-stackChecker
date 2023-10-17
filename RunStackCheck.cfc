@@ -18,14 +18,14 @@ component {
      * @composeFile The name of the Compose/Stack file to use in the Local Environment - Defaulting to docker-compose.yml
      * @serviceName The name of the Service in the Compose/Stack file to use in the Local Environment - Defaulting to the Environment Name
      */
-    function checkLocalStack( 
-        environment="staging", 
-        composeFile="docker-compose.yml", 
-        serviceName="", 
-        envExampleFile=".env.example" 
+    function checkLocalStack(
+        environment="staging",
+        composeFile="docker-compose.yml",
+        serviceName="",
+        envExampleFile=".env.example"
     ){
         setVariables( argumentCollection=arguments );
-		var composeFile = validateDockerComposeFile();
+		var composeFileObject = validateDockerComposeFile();
         dotEnvCheck();
     }
 
@@ -72,7 +72,7 @@ component {
         var composeFile = validateDockerComposeFile();
         //dotEnvCheck();
         var newStackBody = {
-            "StackFileContent": composeFile,
+            "StackFileContent": serializeJSON( composeFile ),
             "Prune": false
         };
         cfhttp( method="put", url="#portainerURL#/api/stacks/#stackID#", result="result"  ){
@@ -82,7 +82,7 @@ component {
         }
         if( result.status_text != "OK" && result.fileContent == "Connection Failure"){
             error( "Error Communicating with Portainer Instance", result );
-        } else if( result.status_text != "OK" ){    
+        } else if( result.status_text != "OK" ){
 			error( "Error updating Stack File", serializeJSON( result ) );
         } else {
             print.green( "Stack file updated - service is updating" ).line().toConsole();
@@ -99,18 +99,18 @@ component {
      * @portainerURL The Portainer URL for this environment
      * @composeFile The name of the Compose/Stack file to use in the Local Environment - Defaulting to docker-compose.yml
      */
-    function checkRemoteSecrets( 
-        environment="staging", 
-        required stackID, 
-        required portainerUsername, 
-        required portainerPassword, 
-        required portainerURL, 
-        composeFile="docker-compose.yml", 
-        serviceName="", 
-        envExampleFile=".env.example" 
+    function checkRemoteSecrets(
+        environment="staging",
+        required stackID,
+        required portainerUsername,
+        required portainerPassword,
+        required portainerURL,
+        composeFile="docker-compose.yml",
+        serviceName="",
+        envExampleFile=".env.example"
     ){
         setVariables( argumentCollection=arguments );
-        
+
         var secretNames = getSecretNamesFromPortainer();
         var composeFileObject = getComposeFileObject();
 
@@ -130,14 +130,14 @@ component {
                 print.line().greenLine( "All Secrets in Compose File are setup in Portainer" ).line().toConsole();
             }
         }
-        
+
 
     }
 
     /********************************************************************************************/
     /***************************    PRIVATE FUNCTIONS    ****************************************/
     /********************************************************************************************/
-    
+
     /**
      * Gets the Secrets from Portainer as an Array of Structs
      */
@@ -170,7 +170,7 @@ component {
         }
         return secretNames;
     }
-    
+
     /**
      * Sets variables and defaults up for the Task Runner
      *
@@ -183,14 +183,14 @@ component {
      * @serviceName The name of the Service which helps find `docker-compose.yml` file by Convention as well.
      * @envExampleFile The name of the .env example file to use in the Local Environment - Defaulting `.env.example`
      */
-    private function setVariables( 
-        environment="staging", 
-        stackID="", 
-        portainerUsername="", 
-        portainerPassword="", 
-        portainerURL="", 
-        composeFile="docker-compose.yml", 
-        serviceName="", 
+    private function setVariables(
+        environment="staging",
+        stackID="",
+        portainerUsername="",
+        portainerPassword="",
+        portainerURL="",
+        composeFile="docker-compose.yml",
+        serviceName="",
         envExampleFile=".env.example" ,
         composePath=""
     ){
@@ -247,7 +247,7 @@ component {
         fileWrite( resolvePath( ".env.stackFile", getCWD() ), "" );
         if( structKeyExists( composeFileObject, "services" )
             && structKeyExists( composeFileObject.services, serviceName )
-            && structKeyExists( composeFileObject.services[ serviceName ], "environment" ) 
+            && structKeyExists( composeFileObject.services[ serviceName ], "environment" )
             && arrayLen( composeFileObject.services[ serviceName ].environment ) ){
             for( var envVar in composeFileObject.services[ serviceName ].environment ){
                 fileAppend( filepath=resolvePath( ".env.stackFile", getCWD() ), data=envVar& chr(13) );
@@ -297,7 +297,7 @@ component {
                 print.cyan( "Compose File has Secrets, but service has no secrets to compare" ).line().toConsole();
             } else {
                 print.cyan( "No Secrets in Compose File to compare" ).line().toConsole();
-            } 
+            }
         }
 
         if( structKeyExists( composeFileObject.services[ serviceName ], "environment" ) && arrayLen( composeFileObject.services[ serviceName ].environment ) ){
@@ -309,7 +309,7 @@ component {
                         if( !structKeyExists( composeFileObject, "secrets" ) || !structKeyExists( composeFileObject.secrets, needle[ "MATCH" ][2] ) ){
                             print.magenta( "Docker Compose #serviceName# Service is referencing a Secret via CommandBox called '#needle[ "MATCH" ][2]#' that is missing from the top level Secrets" ).line().toConsole();
                             errorCount++;
-                        } 
+                        }
                         if( !structKeyExists( serviceSecrets, needle[ "MATCH" ][2] ) ){
                             print.magenta( "Docker Compose #serviceName# Service is referencing a Secret via CommandBox called '#needle[ "MATCH" ][2]#' that is missing from the Service Level Secrets" ).line().toConsole();
                             errorCount++;
@@ -329,7 +329,7 @@ component {
      * Diffs the stackFile from Portainer ( stored as stack.yml locally ) and the environments docker-compose.yml
      */
     private function diffFiles(){
-        
+
         print.line( "Diffing Files" ).toConsole();
         if( len( variables.composePath ) && fileExists( resolvePath( variables.composePath & variables.composeFile, getCWD() ) ) ){
             var composePath = resolvePath( variables.composePath & variables.composeFile, getCWD() );
@@ -353,7 +353,7 @@ component {
     private function dotEnvCheck( envExampleFile=variables.envExampleFile ){
         print.line().line().bold( "Running DotEnv Check" ).line().toConsole();
         createEnvStackFile();
-        
+
         print.line( "Checking all #arguments.envExampleFile# variables exist in the local Compose file #variables.composeFile#" ).toConsole();
         command( "dotenv check" )
             .params(
@@ -361,7 +361,7 @@ component {
                 "envExampleFileName" = arguments.envExampleFile
             )
             .run();
-            
+
         print.line( "Checking all local #variables.composeFile# env variables exist in the .env.example file" ).toConsole();
         command( "dotenv check" )
             .params(
@@ -381,7 +381,7 @@ component {
         print.line().line( "Checking for valid Yaml File" ).toConsole();
         var composeFileObject = getComposeFileObject();
         print.green( "Docker Compose is a valid Yaml File" ).line().toConsole();
-        return composeFile;
+        return composeFileObject;
     }
 
     /**
@@ -445,7 +445,7 @@ component {
      */
     private function portainerLogin(){
         if( variables.jwt.len() ){
-            return variables.jwt;    
+            return variables.jwt;
         }
         print.line().line( "Authenticating with Portainer" ).toConsole();
         var result = "";
@@ -454,7 +454,7 @@ component {
         };
         if( result.status_text != "OK" && result.fileContent == "Connection Failure"){
             error( "Error Communicating with Portainer Instance", serializeJSON( result ) );
-        } else if( result.status_text != "OK" ){    
+        } else if( result.status_text != "OK" ){
 			error( "Error Logging into Portainer", serializeJSON( result ) );
         } else {
             var resultObject = deserializeJSON( result.fileContent );

@@ -69,10 +69,10 @@ component {
      */
     function putStack( environment="staging", stackID, portainerUsername, portainerPassword, portainerURL, composeFile="docker-compose.yml", serviceName="" ){
         setVariables( argumentCollection=arguments );
-        var composeFile = validateDockerComposeFile();
+        var composeFileContents = getComposeFileContents();
         //dotEnvCheck();
         var newStackBody = {
-            "StackFileContent": serializeJSON( composeFile ),
+            "StackFileContent": composeFileContents,
             "Prune": false
         };
         cfhttp( method="put", url="#portainerURL#/api/stacks/#stackID#", result="result"  ){
@@ -257,14 +257,18 @@ component {
         }
     }
 
-    function getComposeFileObject(){
+    function getComposeFileContents(){
         var parser = setupYamlParser();
         if( len( variables.composePath ) && fileExists( resolvePath( variables.composePath & variables.composeFile, getCWD() ) ) ){
             var composeFile = fileRead( resolvePath( variables.composePath & variables.composeFile, getCWD() ) );
         } else {
             var composeFile = fileRead( resolvePath( "build/env/#variables.environment#/#variables.composeFile#", getCWD() ) );
         }
-        return parser.deserialize( composeFile );
+        return composeFile;
+    }
+
+	function getComposeFileObject(){
+        return parser.deserialize( getComposeFileContents() );
     }
 
     /**

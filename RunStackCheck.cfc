@@ -258,7 +258,6 @@ component {
     }
 
     function getComposeFileContents(){
-        var parser = setupYamlParser();
         if( len( variables.composePath ) && fileExists( resolvePath( variables.composePath & variables.composeFile, getCWD() ) ) ){
             var composeFile = fileRead( resolvePath( variables.composePath & variables.composeFile, getCWD() ) );
         } else {
@@ -268,6 +267,7 @@ component {
     }
 
 	function getComposeFileObject(){
+        var parser = setupYamlParser();
         return parser.deserialize( getComposeFileContents() );
     }
 
